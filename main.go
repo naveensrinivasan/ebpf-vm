@@ -24,6 +24,8 @@ func main() {
 		"cpuCount":       "2",
 		"memory":         "4G",
 		"ubuntuVersion":  "22.04",
+		"gitEmail":       "172697+naveensrinivasan@users.noreply.github.com",
+		"gitName":        "naveensrinivasan",
 	}
 
 	config["goDownload"] = fmt.Sprintf("https://go.dev/dl/go%s.linux-%s.tar.gz", config["goVersion"], config["processor"])
@@ -111,6 +113,18 @@ func main() {
 		fmt.Sprintf("sudo apt-get update && sudo apt-get install -y %s", strings.Join(dockerPackages, " ")))
 
 	execCommand("multipass", "exec", config["nodeName"], "--", "sudo", "docker", "run", "hello-world")
+
+	// Add Git configuration after Docker setup
+	execCommand("multipass", "exec", config["nodeName"], "--", "git", "config", "--global", "user.email", config["gitEmail"])
+	execCommand("multipass", "exec", config["nodeName"], "--", "git", "config", "--global", "user.name", config["gitName"])
+
+	// Set default editor to vim in shell
+	execCommand("multipass", "exec", config["nodeName"], "--", "bash", "-c",
+		"echo 'export EDITOR=vim' >> ~/.bashrc && . ~/.bashrc")
+	execCommand("multipass", "exec", config["nodeName"], "--", "bash", "-c",
+		"echo 'export EDITOR=vim' >> ~/.zshrc && . ~/.zshrc")
+
+	execCommand("multipass", "exec", config["nodeName"], "--", "git", "config", "--global", "core.editor", "vim")
 }
 
 func execCommand(name string, arg ...string) {
